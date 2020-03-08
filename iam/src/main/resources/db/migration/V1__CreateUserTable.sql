@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS "users" (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(254) NOT NULL UNIQUE,
+    password VARCHAR(300) NOT NULL,
+    salt VARCHAR(1024) NOT NULL,
+    firstName VARCHAR(50),
+    lastName VARCHAR(60)
+)

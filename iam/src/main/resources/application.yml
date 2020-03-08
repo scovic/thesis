@@ -1,0 +1,29 @@
+app:
+  datasource:
+    jdbc-url: jdbc:postgresql://localhost:5432/iam
+    username: "postgres"
+    password: "root"
+    pool-size: 30
+  hash:
+    algorithm: "PBKDF2WithHmacSHA512"
+    iterations: 65636
+    key-length: 512
+jwt:
+  secret: "somesecret"
+  expiration: 60000
+#  expiration: 18000000
+
+security:
+  oauth2:
+    resource:
+      filter-order: 3
+  signing-key: MaYzkSjmkzPC57L
+  encoding-strength: 256
+  security-realm: IAM
+  jwt:
+    client-id: test
+    client-secret: secret
+    grant-type: password
+    scope-read: read
+    scope-write: write
+    resource-ids: testId
