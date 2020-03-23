@@ -26,7 +26,6 @@ public class UserController {
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  @ResponseBody
   public ResponseEntity<UserDto> register(UserDto user) {
     try {
       return new ResponseEntity<>(this.service.registerUser(user), HttpStatus.CREATED);
@@ -46,13 +45,11 @@ public class UserController {
   }
 
   @GetMapping
-  @ResponseBody
   public ResponseEntity<List<UserDto>> getAllUsers() {
     return new ResponseEntity<>(this.service.getUsers(), HttpStatus.OK);
   }
 
   @GetMapping(path = "{id}")
-  @ResponseBody
   public ResponseEntity<UserDto> getUser(@PathVariable("id") int id) {
     try {
       return new ResponseEntity<>(service.getUser(id), HttpStatus.OK);
@@ -72,7 +69,6 @@ public class UserController {
   }
 
   @GetMapping(params = { "email" })
-  @ResponseBody
   public ResponseEntity<UserDto> getUser(@RequestParam() String email) {
     try {
       return new ResponseEntity<>(service.getUser(email), HttpStatus.OK);
@@ -92,13 +88,11 @@ public class UserController {
   }
 
   @DeleteMapping(path = "{id}")
-  @ResponseBody
   public ResponseEntity<Boolean> deleteUserById(@PathVariable("id") int id) {
     return new ResponseEntity<>(service.deleteUser(id), HttpStatus.OK);
   }
 
   @PutMapping(path = "{id}")
-  @ResponseBody
   public ResponseEntity<Boolean> updateUser(@PathVariable("id") int id, @RequestBody UserDto user) {
     user.setId(id);
     return new ResponseEntity<>(service.updateUser(user), HttpStatus.OK);

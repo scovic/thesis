@@ -139,7 +139,7 @@ public class UserDao implements Dao<User> {
   }
 
   @Override
-  public boolean delete(int id) {
+  public boolean delete(int id)  {
     final String sql = "DELETE FROM \"users\" WHERE id = ?;";
 
     int result = jdbcTemplate.update(sql, new Object[] {id}, new int[] { Types.INTEGER });
