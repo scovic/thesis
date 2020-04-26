@@ -1,6 +1,6 @@
 package com.stefan.iam.api;
 
-import com.stefan.iam.dto.AuthenticateDto;
+import com.stefan.iam.dto.AuthorizeDto;
 import com.stefan.iam.dto.LoginReqDto;
 import com.stefan.iam.dto.LoginRespDto;
 import com.stefan.iam.exception.WrongCredentialsException;
@@ -40,8 +40,8 @@ public class AuthController {
     }
   }
 
-  @PostMapping(value = "/authenticate", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public ResponseEntity<Boolean> authenticate(AuthenticateDto authDto) {
+  @PostMapping(value = "/authorize", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public ResponseEntity<Boolean> authenticate( AuthorizeDto authDto) {
     try { // This is because some funciton in jwt util throws an error
       if (this.service.authenticate(authDto.getToken(), authDto.getEmail())) {
         return new ResponseEntity<>(true, HttpStatus.OK);

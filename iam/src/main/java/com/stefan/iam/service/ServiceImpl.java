@@ -109,7 +109,12 @@ public class ServiceImpl implements Service {
   }
 
   private boolean userExists(String email) {
-    return userDao.get(email) != null;
+    try {
+      userDao.get(email);
+      return true;
+    } catch (Exception ex) {
+      return false;
+    }
   }
 
   @Override

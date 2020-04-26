@@ -6,13 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
-
-// TODO: Maybe change business objects to just data objects (DTOs and similar)?
 
 @Repository("userDao")
 public class UserDao implements Dao<User> {
@@ -94,28 +96,22 @@ public class UserDao implements Dao<User> {
     final String sql = "INSERT INTO \"users\" (email, password, salt, firstName, lastName)" +
             "VALUES (?, ?, ?, ?, ?);";
 
-    final Object[] params = new Object[] {
-      user.getEmail(),
-      user.getPassword(),
-      user.getSalt(),
-      user.getFirstName(),
-      user.getLastName()
-    };
+    KeyHolder holder = new GeneratedKeyHolder();
 
-    final int[] types = {
-      Types.VARCHAR,
-      Types.VARCHAR,
-      Types.VARCHAR,
-      Types.VARCHAR,
-      Types.VARCHAR
-    };
+    int result = jdbcTemplate.update(connection -> {
+      PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-    try {
-      jdbcTemplate.update(sql, params, types);
-      return user;
-    } catch (DataAccessException e) {
-      throw new NotSavedException("New user has not been saved.");
-    }
+      ps.setString(1, user.getEmail());
+      ps.setString(2, user.getPassword());
+      ps.setString(3, user.getSalt());
+      ps.setString(4, user.getFirstName());
+      ps.setString(5, user.getLastName());
+
+      return ps;
+    }, holder);
+
+    user.setId((int) holder.getKeys().get("id"));
+    return user;
   }
 
   @Override

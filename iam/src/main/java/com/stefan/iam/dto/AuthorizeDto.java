@@ -1,10 +1,10 @@
 package com.stefan.iam.dto;
 
-public class AuthenticateDto {
+public class AuthorizeDto {
   private String token;
   private String email;
 
-  public AuthenticateDto(String token, String email) {
+  public AuthorizeDto(String token, String email) {
     this.token = token;
     this.email = email;
   }
