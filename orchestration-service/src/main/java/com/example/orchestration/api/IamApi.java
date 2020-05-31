@@ -6,7 +6,7 @@ import com.example.orchestration.dto.iamservice.LoginRequestDto;
 import com.example.orchestration.dto.iamservice.UserDto;
 import com.example.orchestration.messages.CommandMessage;
 import com.example.orchestration.messages.TransactionStatus;
-import com.example.orchestration.serviceproxy.IamServiceProxy;
+import com.example.orchestration.proxy.IamServiceProxy;
 import io.nats.client.Connection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,32 +19,14 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/iam")
 public class IamApi {
+  @Autowired
   private IamServiceProxy iamServiceProxy;
-  private Connection nats;
 
   @Autowired
-  public IamApi(IamServiceProxy iamServiceProxy, Connection c) {
-    this.iamServiceProxy = iamServiceProxy;
-    this.nats = c;
+  private Connection nats;
 
-//    Dispatcher d = nats.createDispatcher(message -> {
-//      CreateUserReplyDto dto = new CreateUserReplyDto();
-//      dto.setId(5);
-//
-//      ReplyMessage<CreateUserReplyDto> rm = new ReplyMessage<>(dto);
-//      rm.setTransactionStatus(TransactionStatus.FAILURE);
-//      rm.setData(dto);
-//
-//      String json = JsonUtil.toJson(rm);
-//
-//      nats.publish(message.getReplyTo(), json.toString().getBytes());
-//    });
-//
-//    d.subscribe("iam-service-create");
-  }
-
-  @PostMapping
-  public DeferredResult<ResponseEntity<?>> createUser(@RequestBody UserDto userDto) {
+  @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public DeferredResult<ResponseEntity<?>> createUser(UserDto userDto) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     iamServiceProxy.createUser(new CommandMessage<UserDto>(userDto))
@@ -69,14 +51,14 @@ public class IamApi {
     return result;
   }
 
-  @PostMapping("/login")
-  public DeferredResult<ResponseEntity<?>> login(@RequestBody LoginRequestDto loginRequestDto) {
+  @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public DeferredResult<ResponseEntity<?>> login(LoginRequestDto loginRequestDto) {
     CommandMessage<LoginRequestDto> cm = new CommandMessage<>(loginRequestDto);
 
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
     this.iamServiceProxy.login(new CommandMessage<>(loginRequestDto))
         .subscribe(replyMessage -> {
-              if (replyMessage.getTransactionStatus() == TransactionStatus.FAILURE) {
+              if (!replyMessage.isSuccess()) {
                 result.setErrorResult(
                     new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED,
@@ -113,7 +95,7 @@ public class IamApi {
 
     this.iamServiceProxy.authorize(new CommandMessage<AuthorizeDto>(dto))
         .subscribe(replyMessage -> {
-              if (replyMessage.getTransactionStatus() == TransactionStatus.FAILURE) {
+              if (!replyMessage.isSuccess()) {
                 result.setErrorResult(
                     new ResponseStatusException(
                         HttpStatus.FORBIDDEN,
@@ -145,7 +127,7 @@ public class IamApi {
       @PathVariable("id") int id,
       @RequestHeader("Authorization") String token,
       String email
-    ) {
+  ) {
     DeleteUserDto dto = new DeleteUserDto();
     dto.setId(id);
 
@@ -157,7 +139,7 @@ public class IamApi {
 
     this.iamServiceProxy.authorize(new CommandMessage<AuthorizeDto>(authorizeDto))
         .switchMap(replyMessage -> {
-          if (replyMessage.getTransactionStatus() == TransactionStatus.FAILURE) {
+          if (!replyMessage.isSuccess()) {
             throw new ResponseStatusException(
                 HttpStatus.FORBIDDEN,
                 "Forbidden"
@@ -167,7 +149,7 @@ public class IamApi {
           return this.iamServiceProxy.deleteUser(new CommandMessage<DeleteUserDto>(dto));
         })
         .subscribe(replyMessage -> {
-              if (replyMessage.getTransactionStatus() == TransactionStatus.FAILURE) {
+              if (!replyMessage.isSuccess()) {
                 result.setErrorResult(
                     new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
@@ -175,14 +157,11 @@ public class IamApi {
                     )
                 );
               } else {
-                result.setErrorResult(
-                    result.setResult(
-                        new ResponseEntity<>(
-                            replyMessage.getData(),
-                            HttpStatus.ACCEPTED
-                        )
-                    )
-                );
+                result.setResult(
+                    new ResponseEntity<>(
+                        replyMessage.getData(),
+                        HttpStatus.ACCEPTED
+                    ));
               }
             },
             throwable -> {

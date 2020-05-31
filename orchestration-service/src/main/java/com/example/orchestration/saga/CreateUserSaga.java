@@ -5,7 +5,7 @@ import com.example.orchestration.dto.iamservice.DeleteUserDto;
 import com.example.orchestration.dto.iamservice.UserDto;
 import com.example.orchestration.messages.CommandMessage;
 import com.example.orchestration.messages.ReplyMessage;
-import com.example.orchestration.serviceproxy.IamServiceProxy;
+import com.example.orchestration.proxy.IamServiceProxy;
 import com.example.orchestration.transaction.Compensation;
 import com.example.orchestration.transaction.Step;
 import com.example.orchestration.transaction.Transaction;

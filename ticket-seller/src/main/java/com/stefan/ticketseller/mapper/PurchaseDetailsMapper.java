@@ -13,7 +13,7 @@ public class PurchaseDetailsMapper implements RowMapper<PurchaseDetails> {
 
     purchaseDetails.setId(resultSet.getInt("id"));
     purchaseDetails.setUserId(resultSet.getInt("user_id"));
-    purchaseDetails.setPurchaseDate(resultSet.getDate("purchase_date"));
+    purchaseDetails.setPurchaseDate(resultSet.getTimestamp("purchase_date"));
 
     return purchaseDetails;
   }

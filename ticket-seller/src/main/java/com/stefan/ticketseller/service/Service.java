@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface Service {
   List<PurchaseDetails> getUserTickets(int userId);
-  boolean purchaseTicket(int userId, int quantity) throws PurchaseNotCompletedException;
+  List<PurchaseDetails> purchaseTicket(int userId, int quantity) throws PurchaseNotCompletedException;
   void cancelPurchase(int id) throws CancelRequestFailedException;
 }

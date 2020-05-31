@@ -1,9 +1,6 @@
-server:
-  port: 8081
-
 app:
   datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/iam
+    jdbc-url: jdbc:postgresql://postgres-service:5432/iam
     username: "postgres"
     password: "root"
     pool-size: 30
@@ -17,7 +14,7 @@ jwt:
 #  expiration: 18000000
 
 nats:
-  host: nats://localhost:4222
+  host: nats://nats-service:4222
 
 security:
   oauth2:

@@ -15,6 +15,4 @@ public class MessageSubscriber {
     Dispatcher d = natsConneciton.createDispatcher(messageHandler);
     d.subscribe(topic);
   }
-
-
 }

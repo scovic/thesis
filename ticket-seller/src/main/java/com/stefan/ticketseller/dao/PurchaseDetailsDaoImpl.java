@@ -5,14 +5,12 @@ import com.stefan.ticketseller.mapper.PurchaseDetailsMapper;
 import com.stefan.ticketseller.model.PurchaseDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.sql.*;
 import java.util.List;
 
 @Repository("purchaseDetailsDao")
@@ -46,59 +44,44 @@ public class PurchaseDetailsDaoImpl implements PurchaseDetailsDao {
   }
 
   @Override
-  public void save(PurchaseDetails purchaseDetails) throws PurchaseNotSavedException {
+  public PurchaseDetails save(PurchaseDetails purchaseDetails) throws PurchaseNotSavedException {
     try {
-      this.saveOneRow(purchaseDetails);
+      return this.saveOneRow(purchaseDetails);
     } catch (Exception ex) {
       throw new PurchaseNotSavedException();
     }
-  }
-
-  private void saveOneRow(PurchaseDetails purchaseDetails) {
-    String sql = "INSERT INTO \"purchase_details\" (user_id, purchase_date) " +
-        "VALUES (?, ?);";
-
-    Object[] params = new Object[] {
-        purchaseDetails.getUserId(),
-        purchaseDetails.getPurchaseDate().getTime()
-    };
-
-    int[] types = {
-        Types.INTEGER,
-        Types.TIMESTAMP
-    };
-
-    jdbcTemplate.update(sql, params, types);
   }
 
   @Override
-  public void save(List<PurchaseDetails> purchaseDetails) throws PurchaseNotSavedException {
+  public List<PurchaseDetails> save(List<PurchaseDetails> purchaseDetails) throws PurchaseNotSavedException {
     try {
-      this.saveMultipleRows(purchaseDetails);
+      for (PurchaseDetails pd: purchaseDetails) {
+        pd.setId(this.saveOneRow(pd).getId());
+      }
+
+      return purchaseDetails;
     } catch (Exception ex) {
       throw new PurchaseNotSavedException();
     }
   }
 
-  private void saveMultipleRows(List<PurchaseDetails> purchaseDetails) {
-    String sql = "INSERT INTO \"purchase_details\" (user_id, purchase_date)" +
+  private PurchaseDetails saveOneRow(PurchaseDetails purchaseDetails) {
+    String sql = "INSERT INTO \"purchase_details\" (user_id, purchase_date) " +
         "VALUES (?, ?);";
 
-    jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-      @Override
-      public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-        PurchaseDetails pd = purchaseDetails.get(i);
+    KeyHolder holder = new GeneratedKeyHolder();
 
-        preparedStatement.setInt(1, pd.getUserId());
-        preparedStatement.setTimestamp(2, new Timestamp(pd.getPurchaseDate().getTime()));
-      }
+    int result = jdbcTemplate.update(connection -> {
+      PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
+      ps.setInt(1, purchaseDetails.getUserId());
+      ps.setTimestamp(2, new Timestamp(purchaseDetails.getPurchaseDate().getTime()));
 
-      @Override
-      public int getBatchSize() {
-        return purchaseDetails.size();
-      }
-    });
+      return ps;
+    }, holder);
+
+    purchaseDetails.setId((int) holder.getKeys().get("id"));
+    return purchaseDetails;
   }
 
   @Override

@@ -2,9 +2,11 @@ package com.stefan.iam.config;
 
 import io.nats.client.Connection;
 import io.nats.client.Nats;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 @ConfigurationProperties(prefix = "nats")
@@ -12,6 +14,7 @@ public class NatsConfig {
   private String host;
 
   @Bean
+  @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
   public Connection natsConnection() {
     try {
       return Nats.connect(this.host);

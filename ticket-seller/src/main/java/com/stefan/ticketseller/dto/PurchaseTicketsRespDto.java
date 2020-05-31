@@ -1,35 +1,22 @@
 package com.stefan.ticketseller.dto;
 
-import java.util.Date;
+import java.util.List;
 
 public class PurchaseTicketsRespDto {
-  private int id;
-  private int userId;
-  private Date purchaseDate;
+  private List<PurchaseDetailsDto> list;
 
-  public PurchaseTicketsRespDto() { }
-
-  public int getId() {
-    return id;
+  public PurchaseTicketsRespDto() {
   }
 
-  public void setId(int id) {
-    this.id = id;
+  public PurchaseTicketsRespDto(List<PurchaseDetailsDto> list) {
+    this.list = list;
   }
 
-  public int getUserId() {
-    return userId;
+  public List<PurchaseDetailsDto> getList() {
+    return list;
   }
 
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
-
-  public Date getPurchaseDate() {
-    return purchaseDate;
-  }
-
-  public void setPurchaseDate(Date purchaseDate) {
-    this.purchaseDate = purchaseDate;
+  public void setList(List<PurchaseDetailsDto> list) {
+    this.list = list;
   }
 }

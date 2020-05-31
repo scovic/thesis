@@ -8,8 +8,8 @@ import com.stefan.ticketseller.exception.PurchaseNotCompletedException;
 import com.stefan.ticketseller.exception.PurchaseNotSavedException;
 import com.stefan.ticketseller.model.PurchaseDetails;
 import com.stefan.ticketseller.model.TicketsDetails;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,18 +17,11 @@ import java.util.List;
 
 @org.springframework.stereotype.Service("service")
 public class ServiceImpl implements Service {
-
-  private final PurchaseDetailsDao purchaseDetailsDao;
-  private final TicketsDetailsDao ticketsDetailsDao;
+  @Autowired
+  private PurchaseDetailsDao purchaseDetailsDao;
 
   @Autowired
-  public ServiceImpl(
-      @Qualifier("purchaseDetailsDao") PurchaseDetailsDao purchaseDetailsDao,
-      @Qualifier("ticketsDetailsDao") TicketsDetailsDao ticketsDetailsDao
-  ) {
-    this.purchaseDetailsDao = purchaseDetailsDao;
-    this.ticketsDetailsDao = ticketsDetailsDao;
-  }
+  private TicketsDetailsDao ticketsDetailsDao;
 
   @Override
   public List<PurchaseDetails> getUserTickets(int userId) {
@@ -36,12 +29,10 @@ public class ServiceImpl implements Service {
   }
 
   @Override
-  public boolean purchaseTicket(int userId, int quantity) throws PurchaseNotCompletedException {
+  public List<PurchaseDetails> purchaseTicket(int userId, int quantity) throws PurchaseNotCompletedException {
     try {
       this.sellTickets(quantity);
-      this.savePurchase(userId, quantity);
-
-      return true;
+      return this.savePurchase(userId, quantity);
     } catch (Exception ex) {
       throw new PurchaseNotCompletedException(ex.getMessage());
     }
@@ -58,7 +49,7 @@ public class ServiceImpl implements Service {
     this.ticketsDetailsDao.update(ticket.getId(), ticket);
   }
 
-  private void savePurchase (int userId, int quantity) throws PurchaseNotSavedException {
+  private List<PurchaseDetails> savePurchase (int userId, int quantity) throws PurchaseNotSavedException {
     Date currentDate = new Date();
     List<PurchaseDetails> list = new ArrayList<>();
 
@@ -67,7 +58,7 @@ public class ServiceImpl implements Service {
     }
 
     try {
-      this.purchaseDetailsDao.save(list);
+      return this.purchaseDetailsDao.save(list);
     } catch (Exception ex) {
       throw new PurchaseNotSavedException();
     }
@@ -75,9 +66,15 @@ public class ServiceImpl implements Service {
 
   @Override
   public void cancelPurchase(int id) throws CancelRequestFailedException {
+    TicketsDetails ticketsDetails = this.ticketsDetailsDao.getAll().get(0);
+
     try {
       this.purchaseDetailsDao.get(id); // If there is no record in db with the id, it will throw an exception
       this.purchaseDetailsDao.delete(id);
+
+      ticketsDetails.setQuantity(ticketsDetails.getQuantity() + 1);
+
+      this.ticketsDetailsDao.update(ticketsDetails.getId(), ticketsDetails);
     } catch (Exception ex) {
       throw new CancelRequestFailedException(ex.getMessage());
     }

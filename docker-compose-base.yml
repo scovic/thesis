@@ -1,0 +1,29 @@
+version: "3.5"
+
+services:
+  nats-service:
+    image: nats:latest
+    container_name: nats-service
+    expose:
+      - "4222"
+    networks:
+      - diplomski
+
+  postgres-service:
+    image: postgres
+    container_name: postgres-service
+    environment:
+      POSTGRES_PASSWORD: root
+      PGDATA: /usr/local/var/postgres
+    volumes:
+      - ./db-data:/usr/local/var/postgres
+    expose:
+      - "5432"
+    ports:
+      - 5432:5432
+    networks:
+      - diplomski
+
+networks:
+  diplomski:
+    name: diplomski

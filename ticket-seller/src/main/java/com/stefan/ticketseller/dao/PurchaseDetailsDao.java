@@ -10,8 +10,8 @@ public interface PurchaseDetailsDao {
   List<PurchaseDetails> getAll();
   List<PurchaseDetails> getUsersPurchase(int userId);
   PurchaseDetails get(int id) throws EmptyResultDataAccessException;
-  void save(PurchaseDetails purchaseDetails) throws PurchaseNotSavedException;
-  void save(List<PurchaseDetails> purchaseDetails) throws PurchaseNotSavedException;
+  PurchaseDetails save(PurchaseDetails purchaseDetails) throws PurchaseNotSavedException;
+  List<PurchaseDetails> save(List<PurchaseDetails> purchaseDetails) throws PurchaseNotSavedException;
   boolean delete(int id);
   boolean update(int id, PurchaseDetails purchaseDetails);
 }

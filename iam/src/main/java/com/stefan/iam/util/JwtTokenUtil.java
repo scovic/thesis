@@ -1,5 +1,6 @@
 package com.stefan.iam.util;
 
+import com.stefan.iam.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -44,9 +45,13 @@ public class JwtTokenUtil {
     return expiration != null && expiration.before(new Date());
   }
 
-  public String generateToken(String email) {
+  public String generateToken(User user) {
     Map<String, Object> claims = new HashMap<>();
-    return doGenerateToken(claims, email);
+    claims.put("id", user.getId());
+    claims.put("firstName", user.getFirstName());
+    claims.put("lastName", user.getLastName());
+
+    return doGenerateToken(claims, user.getEmail());
   }
 
   private String doGenerateToken(Map<String, Object> claims, String subject) {

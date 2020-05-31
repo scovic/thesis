@@ -1,4 +1,4 @@
-package com.example.orchestration.serviceproxy;
+package com.example.orchestration.proxy;
 
 import com.example.orchestration.MessagePublisher;
 import com.example.orchestration.dto.iamservice.*;

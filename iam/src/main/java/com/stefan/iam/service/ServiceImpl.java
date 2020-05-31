@@ -125,7 +125,7 @@ public class ServiceImpl implements Service {
       throw new WrongCredentialsException();
     }
 
-    return jwtUtil.generateToken(email);
+    return jwtUtil.generateToken(user);
   }
 
 //  @Override
