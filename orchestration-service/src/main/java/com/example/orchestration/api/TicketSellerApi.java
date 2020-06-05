@@ -1,13 +1,12 @@
 package com.example.orchestration.api;
 
-import com.example.orchestration.dto.iamservice.AuthorizeDto;
-import com.example.orchestration.dto.ticketsellerservice.CancelPurchaseDtoReq;
-import com.example.orchestration.dto.ticketsellerservice.GetUserTicketsReqDto;
-import com.example.orchestration.dto.ticketsellerservice.PurchaseTicketsReqDto;
-import com.example.orchestration.messages.CommandMessage;
+import com.example.orchestration.dto.ticketsellerservice.*;
+import com.example.orchestration.messages.ReplyMessage;
 import com.example.orchestration.proxy.IamServiceProxy;
 import com.example.orchestration.proxy.TicketSellerProxy;
-import io.nats.client.Connection;
+import com.example.orchestration.saga.CancelPurchaseSaga;
+import com.example.orchestration.saga.GetUserTicketsSaga;
+import com.example.orchestration.saga.PurchaseTicketsSaga;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,9 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/tickets")
@@ -29,47 +25,52 @@ public class TicketSellerApi {
   private IamServiceProxy iamServiceProxy;
 
   @Autowired
-  private Connection connection;
+  private PurchaseTicketsSaga purchaseTicketsSaga;
+
+  @Autowired
+  private GetUserTicketsSaga getUserTicketsSaga;
+
+  @Autowired
+  private CancelPurchaseSaga cancelPurchaseSaga;
 
   @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> purchaseTickets(
       @RequestHeader("Authorization") String token,
       String email,
       PurchaseTicketsReqDto dto) {
-    AuthorizeDto authorizeDto = new AuthorizeDto();
-    authorizeDto.setToken(token.substring(7));
-    authorizeDto.setEmail(email);
-
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
-    this.iamServiceProxy.authorize(new CommandMessage<>(authorizeDto))
-        .switchMap(replyMessage -> {
-          if (!replyMessage.isSuccess()) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN,
-                "Forbidden"
-            );
-          }
+    try {
+      purchaseTicketsSaga.initSaga(token.substring(7), email, dto);
 
-          return this.ticketSellerProxy.purchaseTickets(new CommandMessage<>(dto));
-        })
-        .subscribe(replyMessage -> {
-              if (!replyMessage.isSuccess()) {
-                result.setErrorResult(
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Something went wrong"
-                    ));
-              } else {
-                result.setResult(new ResponseEntity<>(
-                    replyMessage.getData(),
-                    HttpStatus.ACCEPTED
-                ));
-              }
-            },
-            throwable -> {
-              result.setErrorResult(throwable);
-            });
+      purchaseTicketsSaga.executeSaga()
+          .subscribe(
+              replyMessage -> {
+                ReplyMessage rm = (ReplyMessage) replyMessage;
+                if (!rm.isSuccess()) {
+                  result.setErrorResult(
+                      new ResponseStatusException(
+                          HttpStatus.BAD_REQUEST,
+                          "Something went wrong"
+                      ));
+                } else {
+                  result.setResult(new ResponseEntity<>(
+                      rm.getData(),
+                      HttpStatus.ACCEPTED
+                  ));
+                }
+              },
+              throwable -> {
+                result.setErrorResult(throwable);
+              });
+
+    } catch (Exception ex) {
+      result.setErrorResult(
+          new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              String.format("Something went wrong - %s", ex.getMessage())
+          ));
+    }
 
     return result;
   }
@@ -80,44 +81,42 @@ public class TicketSellerApi {
       @RequestHeader("Authorization") String token,
       @RequestParam("email") String email
   ) {
-    AuthorizeDto authorizeDto = new AuthorizeDto();
-    authorizeDto.setToken(token.substring(7));
-    authorizeDto.setEmail(email);
-
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
-    this.iamServiceProxy.authorize(new CommandMessage<>(authorizeDto))
-        .switchMap(replyMessage -> {
-          if (!replyMessage.isSuccess()) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN,
-                "Forbidden"
-            );
-          }
+    try {
+      this.getUserTicketsSaga.initSaga(token.substring(7), email, userId);
 
-          return this.ticketSellerProxy.getUserTickets(
-              new CommandMessage<>(new GetUserTicketsReqDto(userId))
-          );
-        })
-        .subscribe(replyMessage -> {
-              if (!replyMessage.isSuccess()) {
-                result.setErrorResult(
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Something went wrong"
-                    )
-                );
-              } else {
-                result.setResult(
-                    new ResponseEntity<>(
-                        replyMessage.getData(),
-                        HttpStatus.ACCEPTED
-                    ));
-              }
-            },
-            throwable -> {
-              result.setErrorResult(throwable);
-            });
+      this.getUserTicketsSaga.executeSaga()
+          .subscribe(replyMessage -> {
+                ReplyMessage rm = (ReplyMessage) replyMessage;
+
+                if (!rm.isSuccess()) {
+                  result.setErrorResult(
+                      new ResponseStatusException(
+                          HttpStatus.BAD_REQUEST,
+                          "Something went wrong"
+                      )
+                  );
+                } else {
+                  result.setResult(
+                      new ResponseEntity<>(
+                          rm.getData(),
+                          HttpStatus.ACCEPTED
+                      ));
+                }
+              },
+              throwable -> {
+                result.setErrorResult(throwable);
+              });
+
+    } catch (Exception ex) {
+      result.setErrorResult(
+          new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              String.format("Something went wrong - %s", ex.getMessage())
+          )
+      );
+    }
 
     return result;
   }
@@ -128,44 +127,41 @@ public class TicketSellerApi {
       @RequestHeader("Authorization") String token,
       String email
   ) {
-    AuthorizeDto authorizeDto = new AuthorizeDto();
-    authorizeDto.setToken(token.substring(7));
-    authorizeDto.setEmail(email);
-
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
-    this.iamServiceProxy.authorize(new CommandMessage<AuthorizeDto>(authorizeDto))
-        .switchMap(replyMessage -> {
-          if (!replyMessage.isSuccess()) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN,
-                "Forbidden"
-            );
-          }
+    try {
+      cancelPurchaseSaga.initSaga(token.substring(7), email, id);
+      cancelPurchaseSaga.executeSaga()
+          .subscribe(replyMessage -> {
+                ReplyMessage rm = (ReplyMessage) replyMessage;
 
-          List<Integer> ids = new ArrayList<>();
-          ids.add(id);
-          return this.ticketSellerProxy.cancelPurchase(new CommandMessage<>(new CancelPurchaseDtoReq(ids)));
-        })
-        .subscribe(replyMessage -> {
-              if (!replyMessage.isSuccess()) {
-                result.setErrorResult(
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Something went wrong"
-                    )
-                );
-              } else {
-                result.setResult(
-                    new ResponseEntity<>(
-                        replyMessage.getData(),
-                        HttpStatus.ACCEPTED
-                    ));
-              }
-            },
-            throwable -> {
-              result.setErrorResult(throwable);
-            });
+                if (!rm.isSuccess()) {
+                  result.setErrorResult(
+                      new ResponseStatusException(
+                          HttpStatus.BAD_REQUEST,
+                          "Something went wrong"
+                      )
+                  );
+                } else {
+                  result.setResult(
+                      new ResponseEntity<>(
+                          rm.getData(),
+                          HttpStatus.ACCEPTED
+                      ));
+                }
+              },
+              throwable -> {
+                result.setErrorResult(throwable);
+              });
+
+    } catch (Exception ex) {
+      result.setErrorResult(
+          new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              String.format("Something went wrong - %s", ex.getMessage())
+          )
+      );
+    }
 
     return result;
   }

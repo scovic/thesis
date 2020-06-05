@@ -4,6 +4,6 @@ import com.example.orchestration.messages.CommandMessage;
 import com.example.orchestration.messages.ReplyMessage;
 import io.reactivex.rxjava3.core.Observable;
 
-public interface Transaction<T, K> {
-  Observable<ReplyMessage<T>> execute(CommandMessage<K> k);
+public interface Transaction<N, M> {
+  Observable<ReplyMessage<M>> execute(CommandMessage<N> commandMessage) throws Exception;
 }

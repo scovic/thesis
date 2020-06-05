@@ -5,9 +5,13 @@ import com.example.orchestration.dto.iamservice.DeleteUserDto;
 import com.example.orchestration.dto.iamservice.LoginRequestDto;
 import com.example.orchestration.dto.iamservice.UserDto;
 import com.example.orchestration.messages.CommandMessage;
+import com.example.orchestration.messages.ReplyMessage;
 import com.example.orchestration.messages.TransactionStatus;
 import com.example.orchestration.proxy.IamServiceProxy;
-import io.nats.client.Connection;
+import com.example.orchestration.saga.AuthorizeSaga;
+import com.example.orchestration.saga.CreateUserSaga;
+import com.example.orchestration.saga.DeleteUserSaga;
+import com.example.orchestration.saga.LoginSaga;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,101 +27,128 @@ public class IamApi {
   private IamServiceProxy iamServiceProxy;
 
   @Autowired
-  private Connection nats;
+  private CreateUserSaga createUserSaga;
+
+  @Autowired
+  private LoginSaga loginSaga;
+
+  @Autowired
+  private AuthorizeSaga authorizeSaga;
+
+  @Autowired
+  private DeleteUserSaga deleteUserSaga;
 
   @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> createUser(UserDto userDto) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
-    iamServiceProxy.createUser(new CommandMessage<UserDto>(userDto))
-        .subscribe(replyMessage -> {
-          if (replyMessage.getTransactionStatus() == TransactionStatus.FAILURE) {
-            result.setErrorResult(
-                new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Something went wrong"
-                )
-            );
-          } else {
-            result.setResult(
-                new ResponseEntity<>(
-                    replyMessage.getData(),
-                    HttpStatus.ACCEPTED
-                )
-            );
-          }
-        });
+    try {
+      this.createUserSaga.initSaga(userDto);
+
+      createUserSaga.executeSaga()
+          .subscribe(replyMessage -> {
+                ReplyMessage rm = (ReplyMessage) replyMessage;
+                if (!rm.isSuccess()) {
+                  result.setErrorResult(
+                      new ResponseStatusException(
+                          HttpStatus.BAD_REQUEST,
+                          "Something went wrong"
+                      ));
+                } else {
+                  result.setResult(new ResponseEntity<>(
+                      rm.getData(),
+                      HttpStatus.ACCEPTED
+                  ));
+                }
+              },
+              throwable -> {
+                result.setErrorResult(throwable);
+              });
+
+    } catch (Exception ex) {
+      result.setErrorResult(
+          new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              String.format("Something went wrong - %s", ex.getMessage())
+          ));
+    }
 
     return result;
   }
 
   @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> login(LoginRequestDto loginRequestDto) {
-    CommandMessage<LoginRequestDto> cm = new CommandMessage<>(loginRequestDto);
-
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
-    this.iamServiceProxy.login(new CommandMessage<>(loginRequestDto))
-        .subscribe(replyMessage -> {
-              if (!replyMessage.isSuccess()) {
-                result.setErrorResult(
-                    new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "Bad Credentials"
-                    )
-                );
-              } else {
-                result.setResult(
-                    new ResponseEntity<>(
-                        replyMessage.getData(),
-                        HttpStatus.ACCEPTED
-                    )
-                );
-              }
-            },
-            throwable -> {
-              result.setErrorResult(new ResponseStatusException(
-                  HttpStatus.INTERNAL_SERVER_ERROR,
-                  throwable.getMessage(),
-                  throwable
-              ));
-            });
+
+    try {
+      this.loginSaga.initSaga(loginRequestDto);
+
+      this.loginSaga.executeSaga()
+          .subscribe(replyMessage -> {
+                ReplyMessage rm = (ReplyMessage) replyMessage;
+                if (!rm.isSuccess()) {
+                  result.setErrorResult(
+                      new ResponseStatusException(
+                          HttpStatus.BAD_REQUEST,
+                          "Something went wrong"
+                      ));
+                } else {
+                  result.setResult(new ResponseEntity<>(
+                      rm.getData(),
+                      HttpStatus.ACCEPTED
+                  ));
+                }
+              },
+              throwable -> {
+                result.setErrorResult(throwable);
+              });
+
+    } catch (Exception ex) {
+      result.setErrorResult(
+          new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              String.format("Something went wrong - %s", ex.getMessage())
+          ));
+    }
 
     return result;
   }
 
   @PostMapping(value = "/authorize", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> authorize(@RequestHeader("Authorization") String token, String email) {
-    AuthorizeDto dto = new AuthorizeDto();
-    dto.setEmail(email);
-    dto.setToken(token.substring(7));
-
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
-    this.iamServiceProxy.authorize(new CommandMessage<AuthorizeDto>(dto))
-        .subscribe(replyMessage -> {
-              if (!replyMessage.isSuccess()) {
-                result.setErrorResult(
-                    new ResponseStatusException(
-                        HttpStatus.FORBIDDEN,
-                        "Forbidden"
-                    )
-                );
-              } else {
-                result.setResult(
-                    new ResponseEntity<>(
-                        replyMessage.getData(),
-                        HttpStatus.ACCEPTED
-                    )
-                );
-              }
-            },
-            throwable -> {
-              result.setErrorResult(new ResponseStatusException(
-                  HttpStatus.INTERNAL_SERVER_ERROR,
-                  throwable.getMessage(),
-                  throwable
-              ));
-            });
+    try {
+      authorizeSaga.initSata(token.substring(7), email);
+
+      authorizeSaga.executeSaga()
+          .subscribe(replyMessage -> {
+                ReplyMessage rm = (ReplyMessage) replyMessage;
+                if (!rm.isSuccess()) {
+                  result.setErrorResult(
+                      new ResponseStatusException(
+                          HttpStatus.BAD_REQUEST,
+                          "Something went wrong"
+                      ));
+                } else {
+                  result.setResult(new ResponseEntity<>(
+                      rm.getData(),
+                      HttpStatus.ACCEPTED
+                  ));
+                }
+              },
+              throwable -> {
+                result.setErrorResult(throwable);
+              });
+
+    } catch (Exception ex) {
+      result.setErrorResult(
+          new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              String.format("Something went wrong - %s", ex.getMessage())
+          ));
+    }
+
 
     return result;
   }
@@ -128,45 +159,38 @@ public class IamApi {
       @RequestHeader("Authorization") String token,
       String email
   ) {
-    DeleteUserDto dto = new DeleteUserDto();
-    dto.setId(id);
-
-    AuthorizeDto authorizeDto = new AuthorizeDto();
-    authorizeDto.setToken(token.substring(7));
-    authorizeDto.setEmail(email);
-
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
-    this.iamServiceProxy.authorize(new CommandMessage<AuthorizeDto>(authorizeDto))
-        .switchMap(replyMessage -> {
-          if (!replyMessage.isSuccess()) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN,
-                "Forbidden"
-            );
-          }
+    try {
+      this.deleteUserSaga.initSaga(token.substring(7), email, id);
 
-          return this.iamServiceProxy.deleteUser(new CommandMessage<DeleteUserDto>(dto));
-        })
-        .subscribe(replyMessage -> {
-              if (!replyMessage.isSuccess()) {
-                result.setErrorResult(
-                    new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Something went wrong"
-                    )
-                );
-              } else {
-                result.setResult(
-                    new ResponseEntity<>(
-                        replyMessage.getData(),
-                        HttpStatus.ACCEPTED
-                    ));
-              }
-            },
-            throwable -> {
-              result.setErrorResult(throwable);
-            });
+      this.deleteUserSaga.executeSaga()
+          .subscribe(replyMessage -> {
+                ReplyMessage rm = (ReplyMessage) replyMessage;
+                if (!rm.isSuccess()) {
+                  result.setErrorResult(
+                      new ResponseStatusException(
+                          HttpStatus.BAD_REQUEST,
+                          "Something went wrong"
+                      ));
+                } else {
+                  result.setResult(new ResponseEntity<>(
+                      rm.getData(),
+                      HttpStatus.ACCEPTED
+                  ));
+                }
+              },
+              throwable -> {
+                result.setErrorResult(throwable);
+              });
+
+    } catch (Exception ex) {
+      result.setErrorResult(
+          new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              String.format("Something went wrong - %s", ex.getMessage())
+          ));
+    }
 
     return result;
   }

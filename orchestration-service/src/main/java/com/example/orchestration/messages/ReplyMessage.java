@@ -17,9 +17,18 @@ public class ReplyMessage<T> {
     return transactionStatus;
   }
 
-  public boolean isSuccess () {
+  public boolean isSuccess() {
     return getTransactionStatus() == TransactionStatus.SUCCESS;
   }
+
+  public void setSuccessStatus() {
+    this.setTransactionStatus(TransactionStatus.SUCCESS);
+  }
+
+  public void setFailStatus() {
+    this.setTransactionStatus(TransactionStatus.FAILURE);
+  }
+
 
   public void setTransactionStatus(TransactionStatus transactionStatus) {
     this.transactionStatus = transactionStatus;
