@@ -1,17 +1,9 @@
 package com.example.orchestration.api;
 
-import com.example.orchestration.dto.iamservice.AuthorizeDto;
-import com.example.orchestration.dto.iamservice.DeleteUserDto;
+import com.example.orchestration.saga.IamServiceSagasManager;
 import com.example.orchestration.dto.iamservice.LoginRequestDto;
 import com.example.orchestration.dto.iamservice.UserDto;
-import com.example.orchestration.messages.CommandMessage;
 import com.example.orchestration.messages.ReplyMessage;
-import com.example.orchestration.messages.TransactionStatus;
-import com.example.orchestration.proxy.IamServiceProxy;
-import com.example.orchestration.saga.AuthorizeSaga;
-import com.example.orchestration.saga.CreateUserSaga;
-import com.example.orchestration.saga.DeleteUserSaga;
-import com.example.orchestration.saga.LoginSaga;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,28 +16,16 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/iam")
 public class IamApi {
   @Autowired
-  private IamServiceProxy iamServiceProxy;
-
-  @Autowired
-  private CreateUserSaga createUserSaga;
-
-  @Autowired
-  private LoginSaga loginSaga;
-
-  @Autowired
-  private AuthorizeSaga authorizeSaga;
-
-  @Autowired
-  private DeleteUserSaga deleteUserSaga;
+  private IamServiceSagasManager iamServiceSagasManager;
 
   @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> createUser(UserDto userDto) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.createUserSaga.initSaga(userDto);
+      this.iamServiceSagasManager.getCreateUserSaga().initSaga(userDto);
 
-      createUserSaga.executeSaga()
+      this.iamServiceSagasManager.getCreateUserSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {
@@ -81,9 +61,9 @@ public class IamApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.loginSaga.initSaga(loginRequestDto);
+      this.iamServiceSagasManager.getLoginSaga().initSaga(loginRequestDto);
 
-      this.loginSaga.executeSaga()
+      this.iamServiceSagasManager.getLoginSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {
@@ -115,13 +95,13 @@ public class IamApi {
   }
 
   @PostMapping(value = "/authorize", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public DeferredResult<ResponseEntity<?>> authorize(@RequestHeader("Authorization") String token, String email) {
+  public DeferredResult<ResponseEntity<?>> authorize(@RequestHeader("Authorization") String token) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      authorizeSaga.initSata(token.substring(7), email);
+      this.iamServiceSagasManager.getAuthorizeSaga().initSaga(token.substring(7));
 
-      authorizeSaga.executeSaga()
+      iamServiceSagasManager.getAuthorizeSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {
@@ -156,15 +136,14 @@ public class IamApi {
   @DeleteMapping(path = "/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> deleteUser(
       @PathVariable("id") int id,
-      @RequestHeader("Authorization") String token,
-      String email
+      @RequestHeader("Authorization") String token
   ) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.deleteUserSaga.initSaga(token.substring(7), email, id);
+      this.iamServiceSagasManager.getDeleteUserSaga().initSaga(token.substring(7), id);
 
-      this.deleteUserSaga.executeSaga()
+      this.iamServiceSagasManager.getDeleteUserSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {

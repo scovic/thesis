@@ -1,3 +1,6 @@
+files:
+  storage: ./
+
 nats:
   host: nats://nats-service:4222
-  # host: nats://localhost:4222
+#  host: nats://localhost:4222

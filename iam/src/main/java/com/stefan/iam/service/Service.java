@@ -15,7 +15,7 @@ public interface Service {
   UserDto getUser(String email) throws UserNotFoundException;
   boolean deleteUser(int id);
   boolean updateUser(UserDto user);
-  boolean authenticate(String jwtToken, String email);
+  boolean authenticate(String jwtToken);
   String login(String email, String password) throws WrongCredentialsException;
 //  boolean logout(String email);
 

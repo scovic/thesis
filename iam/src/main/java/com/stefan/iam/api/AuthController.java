@@ -34,16 +34,16 @@ public class AuthController {
           HttpStatus.OK
       );
     } catch (WrongCredentialsException ex) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, ex.getMessage(), ex
-      );
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, ex.getMessage(), ex
+        );
     }
   }
 
   @PostMapping(value = "/authorize", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<Boolean> authenticate( AuthorizeDto authDto) {
-    try { // This is because some funciton in jwt util throws an error
-      if (this.service.authenticate(authDto.getToken(), authDto.getEmail())) {
+    try {
+      if (this.service.authenticate(authDto.getToken())) {
         return new ResponseEntity<>(true, HttpStatus.OK);
       } else {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);

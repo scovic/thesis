@@ -1,0 +1,22 @@
+app:
+  datasource:
+    jdbc-url: jdbc:postgresql://postgres-service:5432/post-service
+#    jdbc-url: jdbc:postgresql://localhost:5432/post-service
+    username: "postgres"
+    password: "root"
+    pool-size: 30
+  file:
+    storage-path: /home/stefan/Projects/diplomski/postservice/storage
+
+nats:
+  host: nats://nats-service:4222
+#  host: nats://localhost:4222
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
+
+#server:
+#  port: 8081

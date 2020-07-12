@@ -4,6 +4,9 @@ services:
   nats-service:
     image: nats:latest
     container_name: nats-service
+    command: "-c /etc/nats/nats.conf"
+    volumes: 
+      - '${NATS_CONFIG_FILE}:/etc/nats'
     expose:
       - "4222"
     networks:

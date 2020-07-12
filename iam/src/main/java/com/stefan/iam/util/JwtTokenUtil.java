@@ -50,6 +50,7 @@ public class JwtTokenUtil {
     claims.put("id", user.getId());
     claims.put("firstName", user.getFirstName());
     claims.put("lastName", user.getLastName());
+    claims.put("email", user.getEmail());
 
     return doGenerateToken(claims, user.getEmail());
   }
@@ -65,8 +66,8 @@ public class JwtTokenUtil {
         .compact();
   }
 
-  public Boolean validateToken(String token, String email) {
-    final String username = getUsernameFromToken(token);
-    return (username.equals(email) && !isTokenExpired(token));
+  public Boolean validateToken(String token) {
+//    final String username = getUsernameFromToken(token);
+    return !isTokenExpired(token);
   }
 }

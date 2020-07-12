@@ -4,9 +4,10 @@ import com.example.orchestration.dto.ticketsellerservice.*;
 import com.example.orchestration.messages.ReplyMessage;
 import com.example.orchestration.proxy.IamServiceProxy;
 import com.example.orchestration.proxy.TicketSellerProxy;
-import com.example.orchestration.saga.CancelPurchaseSaga;
-import com.example.orchestration.saga.GetUserTicketsSaga;
-import com.example.orchestration.saga.PurchaseTicketsSaga;
+import com.example.orchestration.saga.TicketSellerServiceSagasManager;
+import com.example.orchestration.saga.ticketsellersagas.CancelPurchaseSaga;
+import com.example.orchestration.saga.ticketsellersagas.GetUserTicketsSaga;
+import com.example.orchestration.saga.ticketsellersagas.PurchaseTicketsSaga;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,31 +20,21 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/tickets")
 public class TicketSellerApi {
   @Autowired
-  private TicketSellerProxy ticketSellerProxy;
-
-  @Autowired
-  private IamServiceProxy iamServiceProxy;
-
-  @Autowired
-  private PurchaseTicketsSaga purchaseTicketsSaga;
-
-  @Autowired
-  private GetUserTicketsSaga getUserTicketsSaga;
-
-  @Autowired
-  private CancelPurchaseSaga cancelPurchaseSaga;
+  private TicketSellerServiceSagasManager ticketSellerServiceSagasManager;
 
   @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> purchaseTickets(
       @RequestHeader("Authorization") String token,
-      String email,
       PurchaseTicketsReqDto dto) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      purchaseTicketsSaga.initSaga(token.substring(7), email, dto);
+      this.ticketSellerServiceSagasManager
+          .getPurchaseTicketsSaga()
+          .initSaga(token.substring(7), dto);
 
-      purchaseTicketsSaga.executeSaga()
+      this.ticketSellerServiceSagasManager
+          .getPurchaseTicketsSaga().executeSaga()
           .subscribe(
               replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -78,15 +69,18 @@ public class TicketSellerApi {
   @GetMapping(path = "/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> getUserTickets(
       @PathVariable("id") int userId,
-      @RequestHeader("Authorization") String token,
-      @RequestParam("email") String email
+      @RequestHeader("Authorization") String token
   ) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.getUserTicketsSaga.initSaga(token.substring(7), email, userId);
+      this.ticketSellerServiceSagasManager
+          .getGetUserTicketsSaga()
+          .initSaga(token.substring(7), userId);
 
-      this.getUserTicketsSaga.executeSaga()
+      this.ticketSellerServiceSagasManager
+          .getGetUserTicketsSaga()
+          .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
 
@@ -124,14 +118,18 @@ public class TicketSellerApi {
   @DeleteMapping(path = "/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> cancelPurchase(
       @PathVariable("id") int id,
-      @RequestHeader("Authorization") String token,
-      String email
+      @RequestHeader("Authorization") String token
   ) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      cancelPurchaseSaga.initSaga(token.substring(7), email, id);
-      cancelPurchaseSaga.executeSaga()
+      this.ticketSellerServiceSagasManager
+          .getCancelPurchaseSaga()
+          .initSaga(token.substring(7), id);
+
+      this.ticketSellerServiceSagasManager
+          .getCancelPurchaseSaga()
+          .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
 

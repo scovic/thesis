@@ -36,8 +36,8 @@ public class ServiceImpl implements Service {
   }
 
   @Override
-  public boolean authenticate(String jwtToken, String email) {
-    return jwtUtil.validateToken(jwtToken, email);
+  public boolean authenticate(String jwtToken) {
+    return jwtUtil.validateToken(jwtToken);
   }
 
   @Override

@@ -1,25 +1,6 @@
 version: "3.5"
 
 services:
-  # nats-service:
-  #   image: nats:latest
-  #   container_name: nats-service
-  #   expose:
-  #     - "4222"
-  #   networks:
-  #     - diplomski
-
-  # postgres-service:
-  #   image: postgres
-  #   container_name: postgres-service
-  #   environment:
-  #     POSTGRES_PASSWORD: root
-  #     PGDATA: /usr/local/var/postgres
-  #   volumes:
-  #     - ./db-data:/usr/local/var/postgres
-  #   expose:
-  #     - "5432"
-
   iam-service:
     build: ./iam
     image: iam-service
@@ -36,12 +17,20 @@ services:
     networks:
       - diplomski
 
+  post-service:
+    build: ./postservice
+    image: post-service
+    container_name: post-service
+    restart: unless-stopped
+    networks:
+      - diplomski
+
   orchestration-service:
     build: ./orchestration-service
-    image: orchestration-seller-service
-    container_name: orchestration-seller-service
+    image: orchestration-service
+    container_name: orchestration-service
     restart: unless-stopped
-    ports: 
+    ports:
       - 8080:8080
     networks:
       - diplomski

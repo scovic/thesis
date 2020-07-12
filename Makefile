@@ -1,5 +1,5 @@
 build-jars-iam:
-	cd ./iam	mvn clean && mvn package -Dmaven.test.failure.ignore=true
+	cd ./iam &&	mvn clean && mvn package -Dmaven.test.failure.ignore=true
 
 build-jars-ticket-seller:
 	cd ./ticket-seller && mvn clean && mvn package -Dmaven.test.failure.ignore=true
@@ -7,13 +7,17 @@ build-jars-ticket-seller:
 build-jars-orchestration-service:
 	cd ./orchestration-service && mvn clean && mvn package -Dmaven.test.failure.ignore=true
 
+build-jars-post-service:
+	cd ./postservice && mvn clean && mvn package -Dmaven.test.failure.ignore=true
+
 remove-docker-images:
-	docker image rm orchestration-seller-service:latest ticket-seller-service:latest iam-service:latest
+	docker image rm post-service:latest orchestration-service:latest ticket-seller-service:latest iam-service:latest
 
 build-docker-images:	
 	docker build --tag iam-service ./iam
-	docker build --tag orchestration-seller-service ./orchestration-service
+	docker build --tag orchestration-service ./orchestration-service
 	docker build --tag ticket-seller-service ./ticket-seller
+	docker build --tag post-service ./postservice
 
 base_start:
 	docker-compose -f docker-compose-base.yml down --remove-orphans

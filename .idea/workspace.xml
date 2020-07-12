@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="edb29022-b00d-462a-b214-16d4493c9e8d" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1drnTDFQFssUjOUW9gFBIF8bqLG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="jdk.selected.JAVA_MODULE" value="11.0.6" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/postservice" />
+    <property name="settings.editor.selected.configurable" value="com.intellij.jarRepository.settings.RemoteRepositoriesConfigurable" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="edb29022-b00d-462a-b214-16d4493c9e8d" name="Default Changelist" comment="" />
+      <created>1593192084708</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1593192084708</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="773" y="310" width="424" height="484" key="FileChooserDialogImpl" timestamp="1593193207090">
+      <screen x="61" y="27" width="1859" height="1053" />
+    </state>
+    <state x="773" y="310" width="424" height="484" key="FileChooserDialogImpl/61.27.1859.1053@61.27.1859.1053" timestamp="1593193207090" />
+    <state x="299" y="154" width="1372" height="796" key="new project wizard" timestamp="1593192116018">
+      <screen x="61" y="27" width="1859" height="1053" />
+    </state>
+    <state x="299" y="154" width="1372" height="796" key="new project wizard/61.27.1859.1053@61.27.1859.1053" timestamp="1593192116018" />
+  </component>
+</project>

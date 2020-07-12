@@ -3,7 +3,6 @@ package com.stefan.iam.messagehandler;
 import com.google.gson.reflect.TypeToken;
 import com.stefan.iam.MessageHandler;
 import com.stefan.iam.dto.AuthorizeDto;
-import com.stefan.iam.dto.CreateUserReqDto;
 import com.stefan.iam.message.CommandMessage;
 import com.stefan.iam.message.ReplyMessage;
 import com.stefan.iam.message.TransactionStatus;
@@ -33,7 +32,7 @@ public class AuthorizeMessageHandler extends MessageHandler<AuthorizeDto, Boolea
     ReplyMessage<Boolean> replyMessage = new ReplyMessage<>();
 
     try {
-      boolean isAuthorized = this.service.authenticate(authorizeDto.getToken(), authorizeDto.getEmail());
+      boolean isAuthorized = this.service.authenticate(authorizeDto.getToken());
       if (!isAuthorized) {
         replyMessage.setTransactionStatus(TransactionStatus.FAILURE);
       }
