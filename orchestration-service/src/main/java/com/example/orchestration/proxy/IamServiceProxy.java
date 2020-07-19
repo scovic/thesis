@@ -45,6 +45,11 @@ public class IamServiceProxy {
         .map(message-> this.<Boolean>handleReply(message, Boolean.class));
   }
 
+  public Observable<ReplyMessage<UsersDto>> getUsers(CommandMessage<UserIdsDto> dto) {
+    return this.messagePublisher.request(this.getTopic("get-users"), JsonUtil.toJson(dto))
+        .map(message-> this.<UsersDto>handleReply(message, UsersDto.class));
+  }
+
   private <T> ReplyMessage<T> handleReply(Message msg, Class<?> dataType) {
     String json = new String(msg.getData(), StandardCharsets.UTF_8);
     Type replyMessageType = GenericTypeUtil.getType(ReplyMessage.class, dataType);

@@ -4,7 +4,12 @@ public class ReplyMessage<T> {
   private TransactionStatus transactionStatus;
   private T data;
 
+  public ReplyMessage() {
+    this.transactionStatus = TransactionStatus.SUCCESS;
+  }
+
   public ReplyMessage(T data) {
+    this.transactionStatus = TransactionStatus.SUCCESS;
     this.data = data;
   }
 

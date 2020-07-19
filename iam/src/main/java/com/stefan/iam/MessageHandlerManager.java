@@ -1,9 +1,6 @@
 package com.stefan.iam;
 
-import com.stefan.iam.messagehandler.AuthorizeMessageHandler;
-import com.stefan.iam.messagehandler.CreateUserMessageHandler;
-import com.stefan.iam.messagehandler.DeleteUserMessageHandler;
-import com.stefan.iam.messagehandler.LoginMessageHandler;
+import com.stefan.iam.messagehandler.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +14,8 @@ public class MessageHandlerManager {
       CreateUserMessageHandler createUserMessageHandler,
       LoginMessageHandler loginMessageHandler,
       AuthorizeMessageHandler authorizeMessageHandler,
-      DeleteUserMessageHandler deleteUserMessageHandler
+      DeleteUserMessageHandler deleteUserMessageHandler,
+      GetUsersMessageHandler getUsersMessageHandler
   ) {
     this.topic = "iam-service-";
 
@@ -25,6 +23,7 @@ public class MessageHandlerManager {
     messageSubscriber.subscribe(this.getTopic("login"), loginMessageHandler);
     messageSubscriber.subscribe(this.getTopic("authorize"), authorizeMessageHandler);
     messageSubscriber.subscribe(this.getTopic("delete"), deleteUserMessageHandler);
+    messageSubscriber.subscribe(this.getTopic("get-users"), getUsersMessageHandler);
   }
 
   private String getTopic(String t) {

@@ -12,6 +12,10 @@ public class Step<N, M> {
   private Step<?, ?> nextStep;
   private Step<?, ?> prevStep;
 
+  private Step(Transaction<N, M> transaction) {
+    this.transaction = transaction;
+  }
+
   private Step(Transaction<N, M> transaction, N transactionData) {
     this.transaction = transaction;
     this.transactionData = transactionData;
@@ -23,6 +27,10 @@ public class Step<N, M> {
     this.transactionData = transactionData;
   }
 
+  private boolean gotTransactionData() {
+    return this.transactionData != null;
+  }
+
   public Observable<?> executeTransaction() {
     try {
       return transaction.execute(new CommandMessage<N>(this.transactionData))
@@ -32,6 +40,10 @@ public class Step<N, M> {
             } else if (this.nextStep != null) {
               this.compensationData = mReplyMessage.getData();
               this.nextStep.setPrevStep(this);
+
+              if (!this.getNextStep().gotTransactionData()) {
+                this.getNextStep().setTransactionData(mReplyMessage.getData());
+              }
 
               return this.nextStep.executeTransaction();
             } else {
@@ -66,6 +78,14 @@ public class Step<N, M> {
     this.nextStep = nextStep;
   }
 
+  public N getTransactionData() {
+    return this.transactionData;
+  }
+
+  public <G> void setTransactionData(G data) {
+    this.transactionData = (N) data;
+  }
+
   public Step<?, ?> getNextStep() {
     return nextStep;
   }
@@ -73,6 +93,19 @@ public class Step<N, M> {
   public static class StepBuilder {
     private Step firstStep;
     private Step nextStep;
+
+    public <N, M> StepBuilder addStep(Transaction<N, M> transaction) {
+      if (firstStep == null) {
+        firstStep = new Step(transaction);
+        nextStep = firstStep;
+      } else {
+        Step<N, M> newStep = new Step<>(transaction);
+        nextStep.setNextStep(newStep);
+        nextStep = newStep;
+      }
+
+      return this;
+    }
 
     public <N, M> StepBuilder addStep(Transaction<N, M> transaction, N transactionData) {
       if (firstStep == null) {
