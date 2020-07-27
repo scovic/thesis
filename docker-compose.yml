@@ -25,6 +25,14 @@ services:
     networks:
       - diplomski
 
+  notification-service:
+    build: ./notificationsservice
+    image: notification-service
+    container_name: notification-service
+    restart: unless-stopped
+    networks: 
+      - diplomski
+
   orchestration-service:
     build: ./orchestration-service
     image: orchestration-service

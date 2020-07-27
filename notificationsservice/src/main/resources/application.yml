@@ -1,0 +1,8 @@
+instance-id: aa993276-080e-4b51-b54d-94400984ffa2
+secret-key: 22414705EC6F9600259A8D2D3308FAF347BB78F92553D47DA57A5BCF41C1DACF
+
+nats:
+#  host: nats://localhost:4222
+  host: nats://nats-service:4222
+#server:
+#  port: 8084

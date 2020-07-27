@@ -8,6 +8,6 @@ app:
 nats:
   host: nats://nats-service:4222
   # host: nats://localhost:4222
-
-server:
-  port: 8081
+#
+#server:
+#  port: 8081
