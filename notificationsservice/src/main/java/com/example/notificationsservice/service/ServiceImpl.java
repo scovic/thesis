@@ -31,13 +31,7 @@ public class ServiceImpl implements Service {
 
   private void publishReq(Notification notification, List<String> interests) throws IOException, InterruptedException, URISyntaxException {
     Map<String, Map> publishRequest = new HashMap<>();
-
-    Map<String, String> fcmNotification = new HashMap<>();
-    fcmNotification.put("title", notification.getTitle());
-    fcmNotification.put("body", notification.getBody());
-
     Map<String, Map> fcm = new HashMap<>();
-    fcm.put("notification", fcmNotification);
 
     if (notification.hasData()) {
       fcm.put("data", notification.getData().getData());

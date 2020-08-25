@@ -36,7 +36,7 @@ public class UserDao implements Dao<User> {
       user.setEmail(resultSet.getString("email"));
       user.setFirstName(resultSet.getString("firstName"));
       user.setLastName(resultSet.getString("lastName"));
-      user.setPassword(resultSet.getString("password"));
+//      user.setPassword(resultSet.getString("password"));
 
       return user;
     });

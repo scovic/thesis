@@ -22,6 +22,8 @@ services:
     image: post-service
     container_name: post-service
     restart: unless-stopped
+    volumes:
+      - ./postservice/storage:/usr/src/demo/storage
     networks:
       - diplomski
 

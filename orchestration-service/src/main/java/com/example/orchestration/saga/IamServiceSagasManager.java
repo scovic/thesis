@@ -1,9 +1,6 @@
 package com.example.orchestration.saga;
 
-import com.example.orchestration.saga.iamsagas.AuthorizeSaga;
-import com.example.orchestration.saga.iamsagas.CreateUserSaga;
-import com.example.orchestration.saga.iamsagas.DeleteUserSaga;
-import com.example.orchestration.saga.iamsagas.LoginSaga;
+import com.example.orchestration.saga.iamsagas.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +18,9 @@ public class IamServiceSagasManager {
   @Autowired
   private DeleteUserSaga deleteUserSaga;
 
+  @Autowired
+  private GetUsersSaga getUsersSaga;
+
   public CreateUserSaga getCreateUserSaga() {
     return createUserSaga;
   }
@@ -35,5 +35,9 @@ public class IamServiceSagasManager {
 
   public DeleteUserSaga getDeleteUserSaga() {
     return deleteUserSaga;
+  }
+
+  public GetUsersSaga getGetUsersSaga() {
+    return getUsersSaga;
   }
 }

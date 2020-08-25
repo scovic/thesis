@@ -44,3 +44,9 @@ compose_start:
 
 compose_stop:
 	docker-compose down
+
+start:
+	make base_start && make compose_start
+
+stop:
+	make compose_stop && make base_stop

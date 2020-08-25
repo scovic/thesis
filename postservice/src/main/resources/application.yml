@@ -6,7 +6,8 @@ app:
     password: "root"
     pool-size: 30
   file:
-    storage-path: /home/stefan/Projects/diplomski/postservice/storage
+#    storage-path: /home/stefan/Projects/diplomski/postservice/storage
+    storage-path: /usr/src/demo/storage
 
 nats:
   host: nats://nats-service:4222

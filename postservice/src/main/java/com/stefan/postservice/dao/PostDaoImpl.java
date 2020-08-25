@@ -20,7 +20,7 @@ public class PostDaoImpl implements PostDao {
 
   @Override
   public List<Post> getAll() {
-    final String sql = "SELECT * FROM \"posts\";";
+    final String sql = "SELECT * FROM \"posts\" ORDER BY id DESC;";
     return jdbcTemplate.query(sql, new PostMapper());
   }
 

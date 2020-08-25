@@ -173,4 +173,44 @@ public class IamApi {
 
     return result;
   }
+
+  @GetMapping(path = "/{id}")
+  public DeferredResult<ResponseEntity<?>> getUser(
+      @PathVariable("id") int id,
+      @RequestHeader("Authorization") String token
+  ) {
+    DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
+
+    try {
+      this.iamServiceSagasManager.getGetUsersSaga().initSaga(token.substring(7), id);
+
+      this.iamServiceSagasManager.getGetUsersSaga().executeSaga()
+          .subscribe(replyMessage -> {
+                ReplyMessage rm = (ReplyMessage) replyMessage;
+                if (!rm.isSuccess()) {
+                  result.setErrorResult(
+                      new ResponseStatusException(
+                          HttpStatus.BAD_REQUEST,
+                          "Something went wrong"
+                      ));
+                } else {
+                  result.setResult(new ResponseEntity<>(
+                      rm.getData(),
+                      HttpStatus.ACCEPTED
+                  ));
+                }
+              },
+              throwable -> {
+                result.setErrorResult(throwable);
+              });
+    } catch (Exception ex) {
+      result.setErrorResult(
+          new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR,
+              String.format("Something went wrong - %s", ex.getMessage())
+          ));
+    }
+
+    return result;
+  }
 }

@@ -5,6 +5,7 @@ import com.stefan.postservice.MessageHandler;
 import com.stefan.postservice.dto.EmptyDto;
 import com.stefan.postservice.dto.GetPostsDto;
 import com.stefan.postservice.dto.PostDto;
+import com.stefan.postservice.dto.RawFileDto;
 import com.stefan.postservice.message.CommandMessage;
 import com.stefan.postservice.message.ReplyMessage;
 import com.stefan.postservice.message.TransactionStatus;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -43,7 +45,6 @@ public class GetPostsMessageHandler extends MessageHandler<EmptyDto, GetPostsDto
 
     try {
       List<PostDto> posts = Post.convertPostListToPostDtoList(this.service.getAll());
-
 
       for (PostDto post : posts) {
         post.setAttachmentNames(

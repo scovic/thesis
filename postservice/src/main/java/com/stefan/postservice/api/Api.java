@@ -4,6 +4,7 @@ package com.stefan.postservice.api;
 import com.stefan.postservice.dto.CommentDto;
 import com.stefan.postservice.dto.DetailedPostDto;
 import com.stefan.postservice.dto.PostDto;
+import com.stefan.postservice.dto.RawFileDto;
 import com.stefan.postservice.model.Comment;
 import com.stefan.postservice.model.Post;
 import com.stefan.postservice.service.FileStorageService;
@@ -64,6 +65,8 @@ public class Api {
       post.setAttachmentNames(
           this.fileStorageService.listDirFileNames(String.valueOf(post.getId()))
       );
+
+      List<RawFileDto> files = new ArrayList<>();
 
       return new ResponseEntity<DetailedPostDto>(
           new DetailedPostDto(
