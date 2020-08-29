@@ -118,7 +118,7 @@ public class UserDao implements Dao<User> {
   public boolean update(User user) {
     final StringBuilder sql = new StringBuilder("UPDATE \"users\" SET ");
 
-    sql.append(String.format("email = '%s', ", user.getEmail()));
+//    sql.append(String.format("email = '%s', ", user.getEmail()));
     sql.append(String.format("firstName = '%s', ", user.getFirstName()));
     sql.append(String.format("lastName = '%s' ", user.getLastName()));
 

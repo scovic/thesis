@@ -66,7 +66,7 @@ public class TicketSellerApi {
     return result;
   }
 
-  @GetMapping(path = "/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @GetMapping(path = "/{id}")
   public DeferredResult<ResponseEntity<?>> getUserTickets(
       @PathVariable("id") int userId,
       @RequestHeader("Authorization") String token
@@ -115,7 +115,7 @@ public class TicketSellerApi {
     return result;
   }
 
-  @DeleteMapping(path = "/{id}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @DeleteMapping(path = "/{id}")
   public DeferredResult<ResponseEntity<?>> cancelPurchase(
       @PathVariable("id") int id,
       @RequestHeader("Authorization") String token

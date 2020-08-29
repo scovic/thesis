@@ -2,6 +2,7 @@ package com.stefan.postservice.model;
 
 import com.stefan.postservice.dto.PostDto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,8 @@ public class Post {
   private int id;
   private String text;
   private int authorId;
+  private double latitude;
+  private double longitude;
   private Date createdAt;
   private Date updatedAt;
   private List<String> attachmentNames;
@@ -26,7 +29,9 @@ public class Post {
     this.authorId = postDto.getAuthorId();
     this.createdAt = new Date();
     this.updatedAt = new Date();
-    attachmentNames = new ArrayList<>();
+    this.attachmentNames = new ArrayList<>();
+    this.latitude = postDto.getLatitude();
+    this.longitude = postDto.getLongitude();
   }
 
   public Post(String text, int authorId) {
@@ -47,19 +52,21 @@ public class Post {
     attachmentNames = new ArrayList<>();
   }
 
-  public Post(int id, String text, int authorId, Date createdAt, Date updatedAt) {
+  public Post(int id, String text, int authorId, Date createdAt, Date updatedAt, double lat, double lon) {
     this.id = id;
     this.text = text;
     this.authorId = authorId;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    attachmentNames = new ArrayList<>();
+    this.attachmentNames = new ArrayList<>();
+    this.latitude = lat;
+    this.longitude = lon;
   }
 
   public static List<PostDto> convertPostListToPostDtoList(List<Post> posts) {
     List<PostDto> list = new ArrayList<>();
 
-    for(Post post : posts) {
+    for (Post post : posts) {
       list.add(post.getPostData());
     }
 
@@ -75,8 +82,10 @@ public class Post {
         this.id,
         this.text,
         this.getAuthorId(),
-        this.getCreatedAt(),
-        this.getUpdatedAt()
+        this.getCreatedAt().getTime(),
+        this.getUpdatedAt().getTime(),
+        this.latitude,
+        this.longitude
     );
   }
 
@@ -128,5 +137,19 @@ public class Post {
     return attachmentNames;
   }
 
+  public double getLatitude() {
+    return latitude;
+  }
 
+  public void setLatitude(double latitude) {
+    this.latitude = latitude;
+  }
+
+  public double getLongitude() {
+    return longitude;
+  }
+
+  public void setLongitude(double longitude) {
+    this.longitude = longitude;
+  }
 }

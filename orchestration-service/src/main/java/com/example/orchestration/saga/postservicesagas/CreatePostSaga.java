@@ -32,7 +32,7 @@ public class CreatePostSaga {
         .addStep(
             commandMessage -> this.postServiceProxy.createPost(commandMessage),
             compensationCommandMessage -> {
-              System.out.println("Compensation executed");
+
               this.postServiceProxy.deletePost(
                   new CommandMessage<PostDto>(compensationCommandMessage)
               ).subscribe();

@@ -17,6 +17,7 @@ public abstract class MessageHandler<T, N> implements io.nats.client.MessageHand
     CommandMessage<T> commandMessage = this.getCommandMessage(message);
     ReplyMessage<N> replyMessage = this.getReplyMessage(commandMessage.getData());
     try {
+
       this.messagePublisher.publish(message.getReplyTo(), JsonUtil.toJson(replyMessage));
     } catch (Exception ex) {
       System.out.println(ex.getMessage());

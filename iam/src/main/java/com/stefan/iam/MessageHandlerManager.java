@@ -15,7 +15,8 @@ public class MessageHandlerManager {
       LoginMessageHandler loginMessageHandler,
       AuthorizeMessageHandler authorizeMessageHandler,
       DeleteUserMessageHandler deleteUserMessageHandler,
-      GetUsersMessageHandler getUsersMessageHandler
+      GetUsersMessageHandler getUsersMessageHandler,
+      UpdateUserMessageHandler updateUserMessageHandler
   ) {
     this.topic = "iam-service-";
 
@@ -24,6 +25,7 @@ public class MessageHandlerManager {
     messageSubscriber.subscribe(this.getTopic("authorize"), authorizeMessageHandler);
     messageSubscriber.subscribe(this.getTopic("delete"), deleteUserMessageHandler);
     messageSubscriber.subscribe(this.getTopic("get-users"), getUsersMessageHandler);
+    messageSubscriber.subscribe(this.getTopic("update-user"), updateUserMessageHandler);
   }
 
   private String getTopic(String t) {

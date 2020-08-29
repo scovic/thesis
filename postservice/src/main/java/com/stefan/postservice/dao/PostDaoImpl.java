@@ -38,8 +38,8 @@ public class PostDaoImpl implements PostDao {
 
   @Override
   public Post save(Post post) throws FailedDbOperationException {
-    final String sql = "INSERT INTO \"posts\" (text, author_id)"
-        + "VALUES (?, ?);";
+    final String sql = "INSERT INTO \"posts\" (text, author_id, latitude, longitude)"
+        + "VALUES (?, ?, ?, ?);";
 
     KeyHolder holder = new GeneratedKeyHolder();
 
@@ -48,6 +48,8 @@ public class PostDaoImpl implements PostDao {
 
       ps.setString(1, post.getText());
       ps.setInt(2, post.getAuthorId());
+      ps.setDouble(3, post.getLatitude());
+      ps.setDouble(4, post.getLongitude());
 
       return ps;
     }, holder);

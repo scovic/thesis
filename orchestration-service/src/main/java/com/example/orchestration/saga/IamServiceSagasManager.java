@@ -21,6 +21,9 @@ public class IamServiceSagasManager {
   @Autowired
   private GetUsersSaga getUsersSaga;
 
+  @Autowired
+  private UpdateUserSaga updateUserSaga;
+
   public CreateUserSaga getCreateUserSaga() {
     return createUserSaga;
   }
@@ -39,5 +42,9 @@ public class IamServiceSagasManager {
 
   public GetUsersSaga getGetUsersSaga() {
     return getUsersSaga;
+  }
+
+  public UpdateUserSaga getUpdateUserSaga() {
+    return updateUserSaga;
   }
 }

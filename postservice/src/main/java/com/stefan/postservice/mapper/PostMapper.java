@@ -14,7 +14,9 @@ public class PostMapper implements RowMapper<Post> {
         resultSet.getString("text"),
         resultSet.getInt("author_id"),
         resultSet.getTimestamp("created_at"),
-        resultSet.getTimestamp("updated_at")
+        resultSet.getTimestamp("updated_at"),
+        resultSet.getDouble("latitude"),
+        resultSet.getDouble("longitude")
     );
   }
 }

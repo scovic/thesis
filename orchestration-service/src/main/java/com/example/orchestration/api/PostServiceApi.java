@@ -117,7 +117,7 @@ public class PostServiceApi {
   }
 
   @GetMapping("/{id}/comments")
-  public void getPostComments (@RequestHeader("Authorization") String token, @PathVariable int id) {
+  public void getPostComments(@RequestHeader("Authorization") String token, @PathVariable int id) {
     System.out.println(id);
   }
 
@@ -166,12 +166,14 @@ public class PostServiceApi {
     return result;
   }
 
-  @DeleteMapping
+  @DeleteMapping("/{id}")
   public DeferredResult<ResponseEntity<?>> deletePost(
       @RequestHeader("Authorization") String token,
-      PostDto post
+      @PathVariable("id") int postId
   ) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
+    PostDto post = new PostDto();
+    post.setId(postId);
 
     try {
       this.postServiceSagasManager.getDeletePostSaga().initSaga(token.substring(7), post);

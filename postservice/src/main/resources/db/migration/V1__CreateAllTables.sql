@@ -2,6 +2,8 @@ CREATE TABLE IF NOT EXISTS "posts" (
     id SERIAL PRIMARY KEY,
     text VARCHAR(512) NOT NULL,
     author_id INT NOT NULL,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
 );

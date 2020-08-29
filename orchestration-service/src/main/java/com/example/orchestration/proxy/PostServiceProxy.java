@@ -87,9 +87,10 @@ public class PostServiceProxy {
         .map(message -> this.<Boolean>handleReply(message, Boolean.class));
   }
 
-  private <T> ReplyMessage<T>  handleReply(Message msg, Class<?> dataType) {
+  private <T> ReplyMessage<T>  handleReply(Message msg, Class<?> dataType)  {
     String json = new String(msg.getData(), StandardCharsets.UTF_8);
     Type replyMessageType = GenericTypeUtil.getType(ReplyMessage.class, dataType);
+
     return (ReplyMessage<T>) JsonUtil.fromJson(json, replyMessageType);
   }
 

@@ -37,17 +37,22 @@ public class IamServiceProxy {
 
   public Observable<ReplyMessage<LoginResponseDto>> login(CommandMessage<LoginRequestDto> dto) {
     return this.messagePublisher.request(this.getTopic("login"), JsonUtil.toJson(dto))
-        .map(message-> this.<LoginResponseDto>handleReply(message, LoginResponseDto.class));
+        .map(message -> this.<LoginResponseDto>handleReply(message, LoginResponseDto.class));
   }
 
   public Observable<ReplyMessage<Boolean>> authorize(CommandMessage<AuthorizeDto> dto) {
     return this.messagePublisher.request(this.getTopic("authorize"), JsonUtil.toJson(dto))
-        .map(message-> this.<Boolean>handleReply(message, Boolean.class));
+        .map(message -> this.<Boolean>handleReply(message, Boolean.class));
   }
 
   public Observable<ReplyMessage<UsersDto>> getUsers(CommandMessage<UserIdsDto> dto) {
     return this.messagePublisher.request(this.getTopic("get-users"), JsonUtil.toJson(dto))
-        .map(message-> this.<UsersDto>handleReply(message, UsersDto.class));
+        .map(message -> this.<UsersDto>handleReply(message, UsersDto.class));
+  }
+
+  public Observable<ReplyMessage<Boolean>> updateUser(CommandMessage<UserDto> dto) {
+    return this.messagePublisher.request(this.getTopic("update-user"), JsonUtil.toJson(dto))
+        .map(message -> this.<Boolean>handleReply(message, Boolean.class));
   }
 
   private <T> ReplyMessage<T> handleReply(Message msg, Class<?> dataType) {

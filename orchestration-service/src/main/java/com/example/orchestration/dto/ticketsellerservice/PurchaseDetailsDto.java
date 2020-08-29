@@ -7,9 +7,15 @@ import java.util.Date;
 public class PurchaseDetailsDto {
   private int id;
   private int userId;
-  private Date purchaseDate;
+  private long purchaseDate;
 
   public PurchaseDetailsDto(int id, int userId, Date purchaseDate) {
+    this.id = id;
+    this.userId = userId;
+    this.purchaseDate = purchaseDate.getTime();
+  }
+
+  public PurchaseDetailsDto(int id, int userId, long purchaseDateTimestamp) {
     this.id = id;
     this.userId = userId;
     this.purchaseDate = purchaseDate;
@@ -31,11 +37,11 @@ public class PurchaseDetailsDto {
     this.userId = userId;
   }
 
-  public Date getPurchaseDate() {
+  public long getPurchaseDate() {
     return purchaseDate;
   }
 
-  public void setPurchaseDate(Date purchaseDate) {
+  public void setPurchaseDate(long purchaseDate) {
     this.purchaseDate = purchaseDate;
   }
 }

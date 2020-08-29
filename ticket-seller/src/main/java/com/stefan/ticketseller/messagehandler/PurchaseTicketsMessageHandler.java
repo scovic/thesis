@@ -59,7 +59,7 @@ public class PurchaseTicketsMessageHandler extends MessageHandler<PurchaseTicket
       resultList.add(new PurchaseDetailsDto(
           pd.getId(),
           pd.getUserId(),
-          pd.getPurchaseDate()
+          pd.getPurchaseDate().getTime()
       ));
     }
 
