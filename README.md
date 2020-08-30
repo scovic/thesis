@@ -1,11 +1,18 @@
 # Diplomski rad - Backend deo
 
 ## Struktura
+### [30.08.2020.]
+1. notification-service - Servis za hendlovanje notifikacije (info, warning)
+2. post-service - Servis zaduzen za rad sa postovima (kreiranje, azuriranje, brisanje, dovlacenje)
+
+
+### [21.06.2020.]
 1. iam - Servis za upravljanje korisnicima (kreiranje, login, autentikacija, ...)
 2. ticket-seller - Servis za prodaju karata (prodaja, dobavljanje karata korisnika, i otkazivanje)
 3. Orchestration-service - Glavni servis, poseduje endpointe koje klijent (Android app) gadja
 4. docker-compose-base.yml - konfiguracioni fajl putem kog se pokrecu postgres servis i NATS servis
 5. docker-compose.yml - konfiguracioni fajl putem kog se pokrecu iam, ticket-seller i orchestration servisi
+ 
 
 ## Opis
 ### Generalno
@@ -26,3 +33,9 @@ Servis sadrzi po jednu **Proxy** klasu za svaki servis, preko koje salje zahteve
 
  ### Ticket-Seller
  Servis `Ticket-Seller` je zaduzen za prodaju karata. Nacin obradjivanja poruka je isti kao sto je opisan u Iam servisu.
+
+ ### Notification-Service
+ Service `Notification-Service` je zaduzen za prosledjivanje notifikacija korisnicima kao i podataka koji su vezani za notifikaciju. Nacin obradjivanja poruka je isti kao sto je opisan u Iam servisu.
+
+ ### Post-Service 
+Servis `Post-Service` zaduzen za obradjivanje postova koji kreiraju korisnici (kreiranje, azuriranje, brisanje), kao i za skladistenje slika koje idu uz postove. Nacin obradjivanja poruka je isti kao sto je opisan u Iam servisu.
