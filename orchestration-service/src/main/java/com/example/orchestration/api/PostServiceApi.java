@@ -3,20 +3,18 @@ package com.example.orchestration.api;
 import com.example.orchestration.config.FileStorageConfig;
 import com.example.orchestration.dto.postservice.*;
 import com.example.orchestration.messages.ReplyMessage;
-import com.example.orchestration.saga.PostServiceSagasManager;
+import com.example.orchestration.saga.PostServiceSagaManager;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLConnection;
@@ -28,7 +26,7 @@ import java.nio.file.Paths;
 @RequestMapping("/post-service")
 public class PostServiceApi {
   @Autowired
-  private PostServiceSagasManager postServiceSagasManager;
+  private PostServiceSagaManager postServiceSagaManager;
 
   @Autowired
   private FileStorageConfig fileStorageConfig;
@@ -38,9 +36,9 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getGetPostsSaga().initSaga(token.substring(7));
+      this.postServiceSagaManager.getGetPostsSaga().initSaga(token.substring(7));
 
-      this.postServiceSagasManager.getGetPostsSaga()
+      this.postServiceSagaManager.getGetPostsSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -80,9 +78,9 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getGetPostSaga().initSaga(token.substring(7), postId);
+      this.postServiceSagaManager.getGetPostSaga().initSaga(token.substring(7), postId);
 
-      this.postServiceSagasManager.getGetPostSaga()
+      this.postServiceSagaManager.getGetPostSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -130,12 +128,12 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getCreatePostSaga().initSaga(
+      this.postServiceSagaManager.getCreatePostSaga().initSaga(
           token.substring(7),
           new CreatePostDto(post, files)
       );
 
-      this.postServiceSagasManager.getCreatePostSaga()
+      this.postServiceSagaManager.getCreatePostSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -176,8 +174,8 @@ public class PostServiceApi {
     post.setId(postId);
 
     try {
-      this.postServiceSagasManager.getDeletePostSaga().initSaga(token.substring(7), post);
-      this.postServiceSagasManager.getDeletePostSaga()
+      this.postServiceSagaManager.getDeletePostSaga().initSaga(token.substring(7), post);
+      this.postServiceSagaManager.getDeletePostSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -219,12 +217,12 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getUpdatePostSaga().initSaga(
+      this.postServiceSagaManager.getUpdatePostSaga().initSaga(
           token.substring(7),
           new UpdatePostDto(post, files)
       );
 
-      this.postServiceSagasManager.getUpdatePostSaga()
+      this.postServiceSagaManager.getUpdatePostSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -264,9 +262,9 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getCreateCommentSaga().initSaga(token.substring(7), commentDto);
+      this.postServiceSagaManager.getCreateCommentSaga().initSaga(token.substring(7), commentDto);
 
-      this.postServiceSagasManager.getCreateCommentSaga()
+      this.postServiceSagaManager.getCreateCommentSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -306,9 +304,9 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getDeleteCommentSaga().initSaga(token.substring(7), commentDto);
+      this.postServiceSagaManager.getDeleteCommentSaga().initSaga(token.substring(7), commentDto);
 
-      this.postServiceSagasManager.getDeleteCommentSaga()
+      this.postServiceSagaManager.getDeleteCommentSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -348,9 +346,9 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getUpdateCommentSaga().initSaga(token.substring(7), commentDto);
+      this.postServiceSagaManager.getUpdateCommentSaga().initSaga(token.substring(7), commentDto);
 
-      this.postServiceSagasManager.getUpdateCommentSaga()
+      this.postServiceSagaManager.getUpdateCommentSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -392,9 +390,9 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<StreamingResponseBody>> result = new DeferredResult<ResponseEntity<StreamingResponseBody>>();
 
     try {
-      this.postServiceSagasManager.getGetFileSaga().initSaga(token.substring(7), new FileDto(postId, fileName));
+      this.postServiceSagaManager.getGetFileSaga().initSaga(token.substring(7), new FileDto(postId, fileName));
 
-      this.postServiceSagasManager.getGetFileSaga()
+      this.postServiceSagaManager.getGetFileSaga()
           .executeSaga()
           .subscribe(
               replyMessage -> {
@@ -475,9 +473,9 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getDeleteFileSaga().initSaga(token.substring(7), new FileDto(postId, fileName));
+      this.postServiceSagaManager.getDeleteFileSaga().initSaga(token.substring(7), new FileDto(postId, fileName));
 
-      this.postServiceSagasManager.getDeleteFileSaga()
+      this.postServiceSagaManager.getDeleteFileSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
@@ -516,9 +514,9 @@ public class PostServiceApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.postServiceSagasManager.getGetPostsCommentsSaga().initSaga(token.substring(7), postId);
+      this.postServiceSagaManager.getGetPostsCommentsSaga().initSaga(token.substring(7), postId);
 
-      this.postServiceSagasManager.getGetPostsCommentsSaga()
+      this.postServiceSagaManager.getGetPostsCommentsSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;

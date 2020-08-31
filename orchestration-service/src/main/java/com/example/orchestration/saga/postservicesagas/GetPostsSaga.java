@@ -4,7 +4,6 @@ import com.example.orchestration.dto.DetailedPostsDto;
 import com.example.orchestration.dto.EmptyDto;
 import com.example.orchestration.dto.iamservice.AuthorizeDto;
 import com.example.orchestration.dto.iamservice.UserIdsDto;
-import com.example.orchestration.dto.iamservice.UsersDto;
 import com.example.orchestration.dto.postservice.PostDto;
 import com.example.orchestration.dto.postservice.PostsDto;
 import com.example.orchestration.messages.CommandMessage;

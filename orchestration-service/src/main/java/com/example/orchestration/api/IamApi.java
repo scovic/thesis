@@ -1,6 +1,6 @@
 package com.example.orchestration.api;
 
-import com.example.orchestration.saga.IamServiceSagasManager;
+import com.example.orchestration.saga.IamServiceSagaManager;
 import com.example.orchestration.dto.iamservice.LoginRequestDto;
 import com.example.orchestration.dto.iamservice.UserDto;
 import com.example.orchestration.messages.ReplyMessage;
@@ -16,16 +16,16 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/iam")
 public class IamApi {
   @Autowired
-  private IamServiceSagasManager iamServiceSagasManager;
+  private IamServiceSagaManager iamServiceSagaManager;
 
   @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> createUser(UserDto userDto) {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.iamServiceSagasManager.getCreateUserSaga().initSaga(userDto);
+      this.iamServiceSagaManager.getCreateUserSaga().initSaga(userDto);
 
-      this.iamServiceSagasManager.getCreateUserSaga().executeSaga()
+      this.iamServiceSagaManager.getCreateUserSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {
@@ -61,9 +61,9 @@ public class IamApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.iamServiceSagasManager.getLoginSaga().initSaga(loginRequestDto);
+      this.iamServiceSagaManager.getLoginSaga().initSaga(loginRequestDto);
 
-      this.iamServiceSagasManager.getLoginSaga().executeSaga()
+      this.iamServiceSagaManager.getLoginSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {
@@ -99,9 +99,9 @@ public class IamApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.iamServiceSagasManager.getAuthorizeSaga().initSaga(token.substring(7));
+      this.iamServiceSagaManager.getAuthorizeSaga().initSaga(token.substring(7));
 
-      iamServiceSagasManager.getAuthorizeSaga().executeSaga()
+      iamServiceSagaManager.getAuthorizeSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {
@@ -141,9 +141,9 @@ public class IamApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.iamServiceSagasManager.getDeleteUserSaga().initSaga(token.substring(7), id);
+      this.iamServiceSagaManager.getDeleteUserSaga().initSaga(token.substring(7), id);
 
-      this.iamServiceSagasManager.getDeleteUserSaga().executeSaga()
+      this.iamServiceSagaManager.getDeleteUserSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {
@@ -182,9 +182,9 @@ public class IamApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.iamServiceSagasManager.getGetUsersSaga().initSaga(token.substring(7), id);
+      this.iamServiceSagaManager.getGetUsersSaga().initSaga(token.substring(7), id);
 
-      this.iamServiceSagasManager.getGetUsersSaga().executeSaga()
+      this.iamServiceSagaManager.getGetUsersSaga().executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;
                 if (!rm.isSuccess()) {
@@ -225,12 +225,12 @@ public class IamApi {
 
 
     try {
-      this.iamServiceSagasManager.getUpdateUserSaga().initSaga(
+      this.iamServiceSagaManager.getUpdateUserSaga().initSaga(
           token.substring(7),
           userDto
       );
 
-      this.iamServiceSagasManager.getUpdateUserSaga()
+      this.iamServiceSagaManager.getUpdateUserSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
                 ReplyMessage rm = (ReplyMessage) replyMessage;

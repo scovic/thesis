@@ -2,12 +2,7 @@ package com.example.orchestration.api;
 
 import com.example.orchestration.dto.ticketsellerservice.*;
 import com.example.orchestration.messages.ReplyMessage;
-import com.example.orchestration.proxy.IamServiceProxy;
-import com.example.orchestration.proxy.TicketSellerProxy;
-import com.example.orchestration.saga.TicketSellerServiceSagasManager;
-import com.example.orchestration.saga.ticketsellersagas.CancelPurchaseSaga;
-import com.example.orchestration.saga.ticketsellersagas.GetUserTicketsSaga;
-import com.example.orchestration.saga.ticketsellersagas.PurchaseTicketsSaga;
+import com.example.orchestration.saga.TicketSellerServiceSagaManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/tickets")
 public class TicketSellerApi {
   @Autowired
-  private TicketSellerServiceSagasManager ticketSellerServiceSagasManager;
+  private TicketSellerServiceSagaManager ticketSellerServiceSagaManager;
 
   @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public DeferredResult<ResponseEntity<?>> purchaseTickets(
@@ -29,11 +24,11 @@ public class TicketSellerApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.ticketSellerServiceSagasManager
+      this.ticketSellerServiceSagaManager
           .getPurchaseTicketsSaga()
           .initSaga(token.substring(7), dto);
 
-      this.ticketSellerServiceSagasManager
+      this.ticketSellerServiceSagaManager
           .getPurchaseTicketsSaga().executeSaga()
           .subscribe(
               replyMessage -> {
@@ -74,11 +69,11 @@ public class TicketSellerApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.ticketSellerServiceSagasManager
+      this.ticketSellerServiceSagaManager
           .getGetUserTicketsSaga()
           .initSaga(token.substring(7), userId);
 
-      this.ticketSellerServiceSagasManager
+      this.ticketSellerServiceSagaManager
           .getGetUserTicketsSaga()
           .executeSaga()
           .subscribe(replyMessage -> {
@@ -123,11 +118,11 @@ public class TicketSellerApi {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
 
     try {
-      this.ticketSellerServiceSagasManager
+      this.ticketSellerServiceSagaManager
           .getCancelPurchaseSaga()
           .initSaga(token.substring(7), id);
 
-      this.ticketSellerServiceSagasManager
+      this.ticketSellerServiceSagaManager
           .getCancelPurchaseSaga()
           .executeSaga()
           .subscribe(replyMessage -> {

@@ -39,6 +39,16 @@ services:
     networks: 
       - diplomski
 
+  event-details-service:
+    build: ./event_details_service
+    image: event-details-service
+    container_name: event-details-service
+    restart: unless-stopped
+    ports:
+      - 5008:5008 # debug port
+    networks: 
+      - diplomski
+
   orchestration-service:
     build: ./orchestration-service
     image: orchestration-service

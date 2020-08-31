@@ -15,11 +15,14 @@ build-jars-post-service:
 build-jars-notification-service:
 	cd ./notificationsservice && mvn clean && mvn package -Dmaven.test.failure.ignore=true
 
+build-jars-event-details-service:
+	cd ./event_details_service && mvn clean && mvn package -Dmaven.test.failure.ignore=true
+
 
 # DOCKER
 
 remove-docker-images:
-	docker image rm post-service:latest orchestration-service:latest ticket-seller-service:latest iam-service:latest notification-service:latest
+	docker image rm post-service:latest orchestration-service:latest ticket-seller-service:latest iam-service:latest notification-service:latest event-details-service:latest
 
 build-docker-images:	
 	docker build --tag iam-service ./iam
@@ -27,6 +30,7 @@ build-docker-images:
 	docker build --tag ticket-seller-service ./ticket-seller
 	docker build --tag post-service ./postservice
 	docker build --tag notification-service ./notificationsservice
+	docker build --tag event-details-service ./event_details_service
 
 
 # START/STOP

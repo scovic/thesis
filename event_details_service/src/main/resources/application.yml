@@ -1,0 +1,11 @@
+app:
+  datasource:
+    jdbc-url: jdbc:postgresql://postgres-service:5432/event-details-service
+#    jdbc-url: jdbc:postgresql://localhost:5432/event-details-service
+    username: "postgres"
+    password: "root"
+    pool-size: 30
+
+nats:
+  host: nats://nats-service:4222
+#  host: nats://localhost:4222
