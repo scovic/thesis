@@ -43,7 +43,7 @@ public class PurchaseTicketsSaga {
               }
 
               this.ticketSellerProxy.cancelPurchase(new CommandMessage<>(new CancelPurchaseDtoReq(ids)))
-                  .subscribe(); // TODO: find better way, this is stupid
+                  .subscribe(); 
             },
             dto
         ).build();
